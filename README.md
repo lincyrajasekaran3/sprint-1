@@ -1,36 +1,192 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Advanced Data Fetching with Next.js App Router
 
-## Getting Started
+### Static, Dynamic, and Hybrid Rendering
 
-First, run the development server:
+## Overview
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+This project demonstrates how **Next.js App Router** supports different data-fetching and rendering strategies — **Static Rendering (SSG)**, **Dynamic Rendering (SSR)**, and **Hybrid Rendering (ISR)** — and how choosing the right strategy impacts **performance, scalability, cost, and data freshness**.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+The goal is not just to implement these modes, but to understand **when and why** each should be used in a real-world application.
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+---
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Rendering Strategies Used in This App
 
-## Learn More
+### Pages and Rendering Modes
 
-To learn more about Next.js, take a look at the following resources:
+| Route        | Rendering Mode          | Description                                            |
+| ------------ | ----------------------- | ------------------------------------------------------ |
+| `/about`     | Static Rendering (SSG)  | Generated at build time and served as static HTML      |
+| `/dashboard` | Dynamic Rendering (SSR) | Rendered on every request with no caching              |
+| `/news`      | Hybrid Rendering (ISR)  | Static page regenerated periodically in the background |
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Each page is intentionally designed to represent a real-world use case.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+---
 
-## Deploy on Vercel
+## Why Each Rendering Approach Was Chosen
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### Static Rendering (SSG) — `/about`
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+The **About** page uses Static Site Generation because its content is informational and does not change frequently.
+
+* The page is generated **once at build time**
+* Served directly from a CDN
+* No server computation during user requests
+
+**Benefits**
+
+* Extremely fast load times
+* Excellent scalability
+* Lowest hosting cost
+
+This makes SSG ideal for marketing pages, documentation, and content that rarely changes.
+
+---
+
+### Dynamic Rendering (SSR) — `/dashboard`
+
+The **Dashboard** page uses Server-Side Rendering because it represents data that must always be fresh.
+
+* The page is rendered **on every request**
+* Fetching uses `cache: 'no-store'`
+* Rendering is forced with `dynamic = 'force-dynamic'`
+
+**Benefits**
+
+* Always up-to-date data
+* Suitable for real-time or user-specific information
+
+**Trade-offs**
+
+* Slower than static pages
+* Increased server load
+* Higher hosting costs at scale
+
+SSR is best suited for dashboards, analytics, and authenticated pages where freshness is critical.
+
+---
+
+### Hybrid Rendering (ISR) — `/news`
+
+The **News** page uses Incremental Static Regeneration to balance performance and freshness.
+
+* Served as static HTML
+* Automatically regenerated in the background using `revalidate`
+* Users never wait for regeneration
+
+**Benefits**
+
+* Near-static performance
+* Much better scalability than SSR
+* Content stays reasonably fresh
+
+ISR is ideal for news feeds, product listings, and event pages where data changes often but not every second.
+
+---
+
+## Caching, Revalidation, and Performance Impact
+
+Choosing a rendering strategy directly affects performance and scalability:
+
+* **Static Rendering (SSG)**
+  Content is cached permanently at build time, resulting in the fastest response times and minimal server usage.
+
+* **Dynamic Rendering (SSR)**
+  Content is rendered on every request, ensuring freshness but increasing server cost and reducing scalability.
+
+* **Hybrid Rendering (ISR)**
+  Combines static performance with scheduled background updates, significantly reducing server load while keeping content fresh.
+
+This trade-off can be visualized as a triangle:
+
+**Speed ↔ Freshness ↔ Scalability**
+Each rendering mode optimizes two of these at the expense of the third.
+
+---
+
+## Case Study: “The News Portal That Felt Outdated”
+
+### Problem Scenario
+
+At *DailyEdge*, the homepage was statically generated for speed, but users complained that the **Breaking News** section showed outdated headlines.
+
+Switching the entire site to SSR fixed freshness issues but caused:
+
+* Slower page loads
+* Increased server usage
+* Higher hosting costs
+
+### Analysis
+
+The issue occurred because a **single rendering strategy was applied everywhere**, instead of choosing strategies based on content needs.
+
+### Balanced Solution Using Next.js App Router
+
+| Page Section      | Recommended Strategy | Reason                            |
+| ----------------- | -------------------- | --------------------------------- |
+| Homepage layout   | Static (SSG)         | Fast load times                   |
+| Breaking News     | Hybrid (ISR)         | Frequent updates without SSR cost |
+| User dashboards   | Dynamic (SSR)        | Real-time accuracy                |
+| Archived articles | Static (SSG)         | No freshness requirement          |
+
+Using `revalidate` for news content allows updates without sacrificing performance, while SSR is reserved only for pages that truly need it.
+
+---
+
+## Proof of Rendering Behavior
+
+Screenshots and logs are included to verify the rendering behavior.
+
+### Dynamic Rendering (SSR) — `/dashboard`
+
+* Terminal logs show new timestamps on every refresh
+* Network tab confirms data is fetched on each request
+
+![SSR Logs](./screenshots/dashboard-ssr-logs.png)
+![Network Requests](./screenshots/dashboard-network.png)
+
+---
+
+### Hybrid Rendering (ISR) — `/news`
+
+* Page regenerates after the revalidation interval
+* Logs show background regeneration without blocking users
+
+![ISR Logs](./screenshots/news-isr-log.png)
+
+---
+
+### Static Rendering (SSG) — `/about`
+
+* Page generated during build
+* No runtime server execution
+
+![SSG Build Output](./screenshots/about-ssg-build.png)
+
+---
+
+## Reflection: Scaling to More Users
+
+If application traffic increased by 10×:
+
+* Using SSR everywhere would significantly increase server cost and response time
+* Static rendering and ISR would allow most traffic to be served from the CDN
+* SSR should be limited to pages that require real-time or personalized data
+
+In production systems, **choosing the right rendering strategy is a performance and cost decision**, not just a technical one.
+
+---
+
+## Repository & Submission Links
+
+* **GitHub Pull Request:** *(add your PR link here)*
+* **Video Explanation:** *(add your Google Drive link here)*
+
+---
+
+### Final Note
+
+This project demonstrates how thoughtful use of Next.js App Router data-fetching strategies can dramatically improve **performance, scalability, and user experience** when applied correctly.
+
+---
