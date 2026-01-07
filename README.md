@@ -190,3 +190,17 @@ In production systems, **choosing the right rendering strategy is a performance 
 This project demonstrates how thoughtful use of Next.js App Router data-fetching strategies can dramatically improve **performance, scalability, and user experience** when applied correctly.
 
 ---
+
+## 2.4
+
+## Environment-Aware Builds & Secrets Management
+
+Environment segregation is essential because development, staging, and production environments serve different purposes and have different risk levels. In this project, separate configuration files (`.env.development`, `.env.staging`, and `.env.production`) are used so that each environment connects to the correct APIs and services. This prevents test or staging configurations from accidentally being used in production.
+
+Secure secret management improves the safety and reliability of CI/CD pipelines by ensuring sensitive information such as API keys and database URLs are never hardcoded or committed to the repository. Secrets are handled using environment variables and are injected during build or deployment, allowing environment-specific access and safe secret rotation.
+
+### Case Study: The Staging Secret That Broke Production
+
+In the ShopLite scenario, the issue occurred because staging database credentials were mistakenly used in the production environment, which led to live data being overwritten. This situation could have been avoided by enforcing strict environment segregation and storing production secrets securely using tools like GitHub Secrets or cloud key management services.
+
+In this project, environment-aware builds ensure that each deployment loads the correct environment configuration, and secrets are isolated per environment. This approach prevents cross-environment mistakes, protects production data, and improves overall deployment reliability.
