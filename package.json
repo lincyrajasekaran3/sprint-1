@@ -4,12 +4,18 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build:development": "cross-env NODE_ENV=development next build",
+    "build:staging": "cross-env NODE_ENV=staging next build",
+    "build:production": "cross-env NODE_ENV=production next build",
     "start": "next start"
   },
   "dependencies": {
+    "dotenv": "^17.2.3",
     "next": "16.1.1",
     "react": "19.2.3",
     "react-dom": "19.2.3"
+  },
+  "devDependencies": {
+    "cross-env": "^10.1.0"
   }
 }

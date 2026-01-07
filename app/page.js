@@ -13,6 +13,9 @@ export default function Home() {
           height={20}
           priority
         />
+
+        <p>API URL: {process.env.NEXT_PUBLIC_API_URL}</p>
+
         <div className={styles.intro}>
           <h1>To get started, edit the page.js file.</h1>
           <p>
@@ -35,6 +38,7 @@ export default function Home() {
             center.
           </p>
         </div>
+
         <div className={styles.ctas}>
           <a
             className={styles.primary}
