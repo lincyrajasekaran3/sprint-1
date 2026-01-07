@@ -204,3 +204,32 @@ Secure secret management improves the safety and reliability of CI/CD pipelines 
 In the ShopLite scenario, the issue occurred because staging database credentials were mistakenly used in the production environment, which led to live data being overwritten. This situation could have been avoided by enforcing strict environment segregation and storing production secrets securely using tools like GitHub Secrets or cloud key management services.
 
 In this project, environment-aware builds ensure that each deployment loads the correct environment configuration, and secrets are isolated per environment. This approach prevents cross-environment mistakes, protects production data, and improves overall deployment reliability.
+
+---
+
+## Docker, CI/CD, and Secure Cloud Deployments
+
+Docker simplifies deployment by packaging the application, its dependencies,
+and runtime configuration into a single container. In this project, Docker
+ensured that the application behaved the same locally and inside CI pipelines,
+removing “it works on my machine” issues.
+
+CI/CD pipelines further simplify deployments by automating the build process.
+Using GitHub Actions, every code push automatically builds the Docker image,
+which reduces manual errors and ensures broken builds are detected early.
+
+When deploying a full-stack application securely to AWS or Azure, it is critical
+to manage environment variables and secrets properly. Sensitive values should
+never be hardcoded in images or repositories and must be injected at runtime
+using environment variables or secret managers.
+
+### Case Study: The Never-Ending Deployment Loop
+
+In the QuickServe scenario, deployments failed due to missing environment
+variables, port conflicts, and old containers continuing to run in production.
+These issues occur when container lifecycle management and pipeline handoffs
+are not clearly defined.
+
+This can be fixed by ensuring each CI/CD stage cleanly hands off to the next:
+
+---
