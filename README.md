@@ -233,3 +233,34 @@ are not clearly defined.
 This can be fixed by ensuring each CI/CD stage cleanly hands off to the next:
 
 ---
+
+## PostgreSQL Schema Design
+
+### Core Entities
+- **User**: Represents a registered user.
+- **Project**: Represents a project owned by a user.
+- **Task**: Represents tasks under a project.
+
+### Relationships
+- One User → Many Projects
+- One Project → Many Tasks
+
+### Keys & Constraints
+- Primary keys on all tables
+- Foreign keys with `ON DELETE CASCADE`
+- Unique constraint on user email
+- ENUM-based task status
+- Indexed foreign keys for performance
+
+### Normalization
+- **1NF**: All fields contain atomic values
+- **2NF**: No partial dependency on composite keys
+- **3NF**: No transitive dependency between non-key attributes
+
+### Migration & Setup Notes
+Due to IPv4 network restrictions blocking direct PostgreSQL access (port 5432),
+Prisma migrations could not be executed.
+
+The schema was applied directly using SQL in Supabase, which still creates
+the same PostgreSQL tables, constraints, and relationships.
+Verification was done via Supabase Schema Visualizer.
