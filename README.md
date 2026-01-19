@@ -264,3 +264,34 @@ Prisma migrations could not be executed.
 The schema was applied directly using SQL in Supabase, which still creates
 the same PostgreSQL tables, constraints, and relationships.
 Verification was done via Supabase Schema Visualizer.
+
+---
+
+## Transaction & Query Optimisation
+
+### Transactions
+Prisma `$transaction()` was used to ensure atomic creation of related records.
+If any operation fails, all changes are rolled back automatically.
+
+### Rollback Verification
+Rollback behavior was verified by intentionally triggering an error inside a
+transaction and confirming that no partial data was written.
+
+### Indexes Added
+Indexes were added on:
+- User.email
+- Project.userId
+- Task.projectId
+- Task.status
+
+These reduce lookup time and avoid full table scans.
+
+### Query Optimisation
+- Avoided over-fetching using `select`
+- Used pagination with `skip` and `take`
+- Prevented N+1 query patterns
+
+### Reflection
+With increased scale, indexed queries and transactional writes ensure data
+integrity, faster reads, and predictable performance under load.
+
