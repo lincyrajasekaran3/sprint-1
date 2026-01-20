@@ -295,3 +295,25 @@ These reduce lookup time and avoid full table scans.
 With increased scale, indexed queries and transactional writes ensure data
 integrity, faster reads, and predictable performance under load.
 
+---
+
+## Global API Response Handler
+
+To ensure consistent and predictable API responses, a global response handler
+was implemented across all API routes.
+
+### Unified Response Format
+
+All API responses follow this structure:
+
+#### Success Response
+```json
+{
+  "success": true,
+  "message": "Operation successful",
+  "data": {},
+  "timestamp": "2026-01-19T10:00:00Z"
+}
+
+
+
